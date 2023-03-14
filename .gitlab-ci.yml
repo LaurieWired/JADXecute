@@ -1,0 +1,24 @@
+variables:
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  TERM: "dumb"
+
+before_script:
+  - chmod +x gradlew
+
+stages:
+  - test
+
+java-8:
+  stage: test
+  image: openjdk:8
+  script: ./gradlew clean build dist copyExe --warning-mode=all
+
+java-11:
+  stage: test
+  image: openjdk:11
+  script: ./gradlew clean build dist copyExe --warning-mode=all
+
+java-latest:
+  stage: test
+  image: openjdk:latest
+  script: java -version && ./gradlew clean build dist --warning-mode=all

@@ -1,0 +1,11 @@
+path_classifiers:
+  test:
+    - "**/test/**/*.java"
+
+extraction:
+  java:
+    index:
+      build_command: ./gradlew clean build -x test
+      java_version: 11
+      properties_files: true
+      xml_mode: disabled

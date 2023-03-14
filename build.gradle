@@ -1,0 +1,160 @@
+plugins {
+	id 'com.github.ben-manes.versions' version '0.45.0'
+	id 'com.diffplug.spotless' version '6.13.0'
+}
+
+ext.jadxVersion = System.getenv('JADX_VERSION') ?: "dev"
+version = jadxVersion
+println("jadx version: ${jadxVersion}")
+
+allprojects {
+	apply plugin: 'java'
+	apply plugin: 'checkstyle'
+
+	version = jadxVersion
+
+	sourceCompatibility = JavaVersion.VERSION_1_8
+
+	compileJava {
+		options.encoding = "UTF-8"
+	}
+
+	jar {
+		manifest {
+			mainAttributes('jadx-version': jadxVersion)
+		}
+	}
+
+	dependencies {
+		implementation 'org.slf4j:slf4j-api:2.0.6'
+		compileOnly 'org.jetbrains:annotations:24.0.0'
+
+		testImplementation 'ch.qos.logback:logback-classic:1.3.5'
+		testImplementation 'org.hamcrest:hamcrest-library:2.2'
+		testImplementation 'org.mockito:mockito-core:4.10.0'
+		testImplementation 'org.assertj:assertj-core:3.24.2'
+
+		testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+		testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
+
+		testCompileOnly 'org.jetbrains:annotations:24.0.0'
+	}
+
+	test {
+		useJUnitPlatform()
+		maxParallelForks = Runtime.runtime.availableProcessors()
+	}
+
+	repositories {
+		mavenLocal()
+		mavenCentral()
+		google()
+		// Commented out for now since we're using a local mapping-io fork atm.
+        // maven {
+		// 	name 'FabricMC'
+		// 	url 'https://maven.fabricmc.net/'
+		// }
+	}
+}
+
+spotless {
+	java {
+		target fileTree(rootDir).matching {
+			include 'jadx-cli/src/**/java/**/*.java'
+			include 'jadx-core/src/**/java/**/*.java'
+			include 'jadx-gui/src/**/java/**/*.java'
+			include 'jadx-plugins/**/java/**/*.java'
+		}
+
+		importOrderFile 'config/code-formatter/eclipse.importorder'
+		eclipse().configFile 'config/code-formatter/eclipse.xml'
+		removeUnusedImports()
+
+		lineEndings(com.diffplug.spotless.LineEnding.UNIX)
+		encoding("UTF-8")
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+	format 'misc', {
+		target '**/*.gradle', '**/*.md', '**/*.xml', '**/.gitignore', '**/.properties'
+		targetExclude ".gradle/**", ".idea/**", "*/build/**"
+
+		lineEndings(com.diffplug.spotless.LineEnding.UNIX)
+		encoding("UTF-8")
+		trimTrailingWhitespace()
+		endWithNewline()
+	}
+}
+
+dependencyUpdates {
+	resolutionStrategy {
+		componentSelection { rules ->
+			rules.all { ComponentSelection selection ->
+				boolean rejected = ['alpha', 'beta', 'rc', 'cr', 'm', 'atlassian'].any { qualifier ->
+					selection.candidate.version ==~ /(?i).*[.-]${qualifier}[.\d-]*/
+				}
+				if (rejected) {
+					selection.reject('Release candidate')
+				}
+			}
+		}
+	}
+}
+
+task copyArtifacts(type: Copy) {
+	from tasks.getByPath(":jadx-cli:installDist")
+	from tasks.getByPath(":jadx-gui:installDist")
+	into layout.buildDirectory.dir("jadx")
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+task pack(type: Zip) {
+	from copyArtifacts
+	archiveFileName = "jadx-${jadxVersion}.zip"
+	destinationDirectory = layout.buildDirectory
+}
+
+task copyExe(type: Copy) {
+	group 'jadx'
+	description = 'Copy exe to build dir'
+	mustRunAfter pack // not needed, but gradle throws warning because of same output dir
+
+	from tasks.getByPath('jadx-gui:createExe')
+	include '*.exe'
+	into layout.buildDirectory
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+task distWinBundle(type: Copy, dependsOn: 'jadx-gui:distWinWithJre') {
+	group 'jadx'
+	description = 'Copy bundle to build dir'
+	destinationDir buildDir
+	from(tasks.getByPath('jadx-gui:distWinWithJre').outputs) {
+		include '*.zip'
+	}
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+task dist {
+	group 'jadx'
+	description = 'Build jadx distribution zip'
+
+	dependsOn(pack)
+
+	OperatingSystem os = org.gradle.nativeplatform.platform.internal.DefaultNativePlatform.currentOperatingSystem;
+	if (os.isWindows()) {
+		if (project.hasProperty("bundleJRE")) {
+			println("Build win bundle with JRE")
+			dependsOn('distWinBundle')
+		} else {
+			dependsOn('copyExe')
+		}
+	}
+}
+
+task cleanBuildDir(type: Delete) {
+	group 'jadx'
+	delete buildDir
+}
+
+clean.dependsOn(cleanBuildDir)
