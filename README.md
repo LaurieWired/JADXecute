@@ -3,7 +3,7 @@
 [![Follow @lauriewired](https://img.shields.io/twitter/follow/lauriewired?style=social)](https://twitter.com/lauriewired)
 # Description
 
-**JADXecute** is a plugin for **[JADX](https://github.com/skylot/jadx)** that enhances its functionality by adding a **Dynamic Code Execution** option.
+**JADXecute** is a plugin for **[JADX](https://github.com/skylot/jadx)** that enhances its functionality by adding **Dynamic Code Execution** abilities.
 
 With **JADXecute**, you can dynamically run Java code to modify or print components of the jadx-gui output. **JADXecute** is inspired by **IDAPython** to help Android Reverse Engineers in analyzing APKs in a more automated way.
 
