@@ -7,6 +7,8 @@
 
 With **JADXecute**, you can dynamically run Java code to modify or print components of the jadx-gui output. **JADXecute** is inspired by **IDAPython** to help Android Reverse Engineers in analyzing APKs in a more automated way.
 
+** Demo Video Here **
+
 # Installation
 
 ** System Requirements: **
@@ -28,8 +30,13 @@ Once you've opened the plugin, enter your code into the "Java Input" area. Your 
 Once you've written your code, hit run and you should either see successful console output or the list of code compilation errors that Java encountered when compiling your jadx-scripting code.
 
 # Contribute
+- Make a pull request
+- Add an Example Snippet to our Wiki
+- Report an error/issue
+- Suggest an improvement
+- Share with others or give a star!
 
-# 
+# Screenshots
 
 
 
