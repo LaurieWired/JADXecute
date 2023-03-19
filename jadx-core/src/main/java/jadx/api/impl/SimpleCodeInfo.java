@@ -17,11 +17,6 @@ public class SimpleCodeInfo implements ICodeInfo {
 	}
 
 	@Override
-	public void setCodeStr(String codeStr) {
-		this.code = codeStr;
-	}
-
-	@Override
 	public ICodeMetadata getCodeMetadata() {
 		return ICodeMetadata.EMPTY;
 	}

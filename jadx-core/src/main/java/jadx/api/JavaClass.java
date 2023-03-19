@@ -57,11 +57,6 @@ public final class JavaClass implements JavaNode {
 		return getCodeInfo().getCodeStr();
 	}
 
-	// TODO: limit this
-	public void setCode(String codeStr) {
-		getCodeInfo().setCodeStr(codeStr);
-	}
-
 	public @NotNull ICodeInfo getCodeInfo() {
 		ICodeInfo code = load();
 		if (code != null) {

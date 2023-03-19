@@ -9,10 +9,6 @@ public interface ICodeInfo {
 
 	String getCodeStr();
 
-	// Temporary until secure method for updating code is added
-	// TODO: swap for limited / safe code updates
-	void setCodeStr(String codeStr);
-
 	ICodeMetadata getCodeMetadata();
 
 	boolean hasMetadata();
