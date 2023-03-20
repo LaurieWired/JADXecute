@@ -40,11 +40,11 @@ Optionally, you can also select from the many templates to get you started or ev
 
 # Screenshots
 
-## Basic JADXecute view
+### Basic JADXecute view
 ![jadxecutewithicon](https://user-images.githubusercontent.com/123765654/226281090-c38da099-9b47-4918-ade0-015ec0acc7d2.png)
 
-## Printing all classes inheriting from a class
+### Printing all classes inheriting from a class
 ![inheritingexample](https://user-images.githubusercontent.com/123765654/226281266-7a62bbaa-3d22-412f-ae50-3ab2500f7a19.png)
 
-## Syntax errors
+### Syntax errors
 ![syntaxerror](https://user-images.githubusercontent.com/123765654/226281371-aac333f5-acb7-4b41-a4b5-2efaaa05b144.png)
