@@ -14,13 +14,10 @@ https://user-images.githubusercontent.com/123765654/226236645-e2b05f49-6c5d-4ee0
 
 # Installation
 
-** System Requirements: **
-- JADX Version blahblah+
+This code is based on the latest release of JADX version 1.4.6. It contains an additional plugin to enable dynamic Java coding using all of the standard Java libraries as well as the JADX libs and APIs. simply download this release of JADX with the embedded plugin and run as you normally would! To run JADXecute, click the coffee cup in the plugins section at the top of JADX or select "Tools -> JADXecute".
 
 
 # Usage
-
-## Demos:
 
 Once you've opened the plugin, enter your code into the "Java Input" area. Your code must follow the same style as the examples used below or else jadx-scripting will not be able to handle the code call. The following are a few important guidelines to follow (Note: all of these are demonstrated in the template and examples shown below):
 - Name your class "UserCodeClass"
@@ -32,6 +29,8 @@ Once you've opened the plugin, enter your code into the "Java Input" area. Your 
     
 Once you've written your code, hit run and you should either see successful console output or the list of code compilation errors that Java encountered when compiling your jadx-scripting code.
 
+Optionally, you can also select from the many templates to get you started or even input your own Java file as long as it follows the guidelines from above.
+
 # Contribute
 - Make a pull request
 - Add an Example Snippet to our Wiki
@@ -41,6 +40,11 @@ Once you've written your code, hit run and you should either see successful cons
 
 # Screenshots
 
+## Basic JADXecute view
+![jadxecutewithicon](https://user-images.githubusercontent.com/123765654/226281090-c38da099-9b47-4918-ade0-015ec0acc7d2.png)
 
+## Printing all classes inheriting from a class
+![inheritingexample](https://user-images.githubusercontent.com/123765654/226281266-7a62bbaa-3d22-412f-ae50-3ab2500f7a19.png)
 
-
+## Syntax errors
+![syntaxerror](https://user-images.githubusercontent.com/123765654/226281371-aac333f5-acb7-4b41-a4b5-2efaaa05b144.png)
