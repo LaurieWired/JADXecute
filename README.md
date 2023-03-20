@@ -20,8 +20,6 @@ https://user-images.githubusercontent.com/123765654/226236645-e2b05f49-6c5d-4ee0
 
 # Usage
 
-## Demos:
-
 Once you've opened the plugin, enter your code into the "Java Input" area. Your code must follow the same style as the examples used below or else jadx-scripting will not be able to handle the code call. The following are a few important guidelines to follow (Note: all of these are demonstrated in the template and examples shown below):
 - Name your class "UserCodeClass"
 - Implement the userCodeMain(MainWindow mainWindow) class
