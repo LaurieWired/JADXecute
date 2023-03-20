@@ -1,10 +1,7 @@
-package jadx.gui.plugins.jadxscripting;
+package jadx.gui.plugins.jadxecute;
 
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -12,49 +9,26 @@ import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import javax.swing.AbstractAction;
-import javax.swing.event.PopupMenuEvent;
-
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jadx.api.ICodeInfo;
-import jadx.api.JavaMethod;
 import jadx.api.JavaNode;
 import jadx.api.data.ICodeComment;
 import jadx.api.data.impl.JadxCodeComment;
 import jadx.api.data.impl.JadxCodeData;
 import jadx.api.data.impl.JadxCodeRef;
 import jadx.api.data.impl.JadxNodeRef;
-import jadx.api.metadata.ICodeAnnotation;
-import jadx.api.metadata.ICodeAnnotation.AnnType;
-import jadx.api.metadata.ICodeMetadata;
-import jadx.api.metadata.ICodeNodeRef;
-import jadx.api.metadata.annotations.InsnCodeOffset;
-import jadx.api.metadata.annotations.NodeDeclareRef;
-import jadx.gui.JadxWrapper;
 import jadx.gui.treemodel.JClass;
 import jadx.gui.ui.MainWindow;
 import jadx.gui.ui.codearea.CodeArea;
-import jadx.gui.ui.dialog.CommentDialog;
-import jadx.gui.utils.DefaultPopupMenuListener;
-import jadx.gui.utils.NLS;
-import jadx.gui.utils.UiUtils;
 import jadx.gui.settings.JadxProject;
 
-import jadx.api.JavaClass;
 import jadx.api.JavaVariable;
-import jadx.api.data.ICodeRename;
-import jadx.api.data.impl.JadxCodeRename;
-import jadx.core.deobf.NameMapper;
 import jadx.core.utils.exceptions.JadxRuntimeException;
 import jadx.gui.jobs.TaskStatus;
-import jadx.gui.treemodel.JField;
 import jadx.gui.treemodel.JMethod;
 import jadx.gui.treemodel.JNode;
 import jadx.gui.treemodel.JPackage;
-import jadx.gui.treemodel.JVariable;
 import jadx.gui.ui.TabbedPane;
 import jadx.gui.ui.codearea.ClassCodeContentPanel;
 import jadx.gui.ui.panel.ContentPanel;

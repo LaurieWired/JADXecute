@@ -1,4 +1,4 @@
-package jadx.gui.plugins.jadxscripting;
+package jadx.gui.plugins.jadxecute;
 
 import javax.tools.*;
 import java.io.ByteArrayOutputStream;
@@ -13,8 +13,6 @@ import java.util.List;
 
 import jadx.gui.ui.MainWindow;
 
-// Example code loading from https://gist.github.com/chrisvest/9873843
-// TODO: check and see if this can be more efficient
 public class UserCodeLoader {
 	public String runInputCode(String program, MainWindow mainWindow) throws Exception {
 		// Compile the input code

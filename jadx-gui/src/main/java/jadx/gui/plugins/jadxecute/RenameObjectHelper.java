@@ -1,4 +1,4 @@
-package jadx.gui.plugins.jadxscripting;
+package jadx.gui.plugins.jadxecute;
 
 import java.util.ArrayList;
 import java.util.Collections;
