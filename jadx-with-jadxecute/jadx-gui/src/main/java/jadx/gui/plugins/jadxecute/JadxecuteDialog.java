@@ -29,6 +29,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Font;
 
 import javax.swing.JFileChooser;
 import javax.swing.JList;
@@ -46,9 +47,13 @@ public class JadxecuteDialog extends JDialog {
 	private final transient JadxSettings settings;
 	private final transient MainWindow mainWindow;
 
+	private static final int DEFAULT_FONT_SIZE = 12;
+
 	public JadxecuteDialog(MainWindow mainWindow) {
+		super(mainWindow, "JADXexecute", true);
 		this.mainWindow = mainWindow;
 		this.settings = mainWindow.getSettings();
+
 		initUI();
 	}
 
@@ -56,16 +61,18 @@ public class JadxecuteDialog extends JDialog {
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BorderLayout());
 		mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
-		
+
 		// Input and output code areas
 		JLabel codeInputDescription = new JLabel("Java Input");
-		codeInputDescription.setPreferredSize(new Dimension(80, 16));
+		codeInputDescription.setFont(new Font(null, Font.BOLD, DEFAULT_FONT_SIZE));
+		codeInputDescription.setPreferredSize(new Dimension(100, 16));
 		RSyntaxTextArea codeInputArea = new RSyntaxTextArea(getDefaultCodeInputText());
 		codeInputArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
 		JScrollPane codeInputScrollPanel = new JScrollPane(codeInputArea);
-		codeInputScrollPanel.setPreferredSize(new Dimension(550, 200));
+		codeInputScrollPanel.setPreferredSize(new Dimension(600, 200));
 		
 		JLabel consoleOutputDescription = new JLabel("Console Output");
+		consoleOutputDescription.setFont(new Font(null, Font.BOLD, DEFAULT_FONT_SIZE));
 		consoleOutputDescription.setPreferredSize(new Dimension(80, 16));
 		consoleOutputDescription.setBorder(new EmptyBorder(10, 0, 10, 0));
 		JTextArea consoleOutputArea = new JTextArea("  ");
@@ -85,11 +92,14 @@ public class JadxecuteDialog extends JDialog {
 		bottomPan.setLayout(new BorderLayout());
 		JPanel buttonPane = new JPanel();
 		JLabel statusLabel = new JLabel("Status: Ready");
-		statusLabel.setPreferredSize(new Dimension(80, 16));
+		statusLabel.setPreferredSize(new Dimension(100, 16));
 		JButton run = new JButton("Run");
 		JButton close = new JButton("Close");
 		close.addActionListener(event -> close());
+
+		// run code
 		run.addActionListener(event -> runUserCode(codeInputArea, consoleOutputArea, statusLabel, run));
+		
 		buttonPane.add(run);
 		buttonPane.add(close);
 		bottomPan.add(statusLabel, BorderLayout.WEST);
@@ -137,7 +147,8 @@ public class JadxecuteDialog extends JDialog {
 		codeExamplesPanel.setLayout(new BorderLayout());
 		codeExamplesPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
 		JLabel scriptSelection = new JLabel("Select Template:");
-		
+		scriptSelection.setFont(new Font(null, Font.BOLD, DEFAULT_FONT_SIZE));
+
 		JScrollPane exampleScrollPane = initCodeExamplesListeners(codeInputArea);
 		JPanel southExamplesPanel = new JPanel();
 		southExamplesPanel.setLayout(new BorderLayout());
@@ -145,7 +156,7 @@ public class JadxecuteDialog extends JDialog {
 		southExamplesPanel.add(exampleScrollPane, BorderLayout.CENTER);
 		codeExamplesPanel.add(filePanel, BorderLayout.NORTH);
 		codeExamplesPanel.add(southExamplesPanel, BorderLayout.CENTER);
-		codeExamplesPanel.setPreferredSize(new Dimension(200, 400));
+		codeExamplesPanel.setPreferredSize(new Dimension(300, 400));
 
 		return codeExamplesPanel;
 	}
@@ -156,12 +167,14 @@ public class JadxecuteDialog extends JDialog {
 		
 		setTitle("JADXecute");
 		pack();
-		if (!mainWindow.getSettings().loadWindowPos(this)) {
-			setSize(800, 500);
-		}
-		setLocationRelativeTo(null);
+		
+		// set modal size
+		setSize(1024, 768);
+		
+		setLocationRelativeTo(mainPanel);
+		this.setModal(false);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-		setModalityType(ModalityType.APPLICATION_MODAL);
+		// setModalityType(ModalityType.APPLICATION_MODAL);
 		UiUtils.addEscapeShortCutToDispose(this);
 	}
 
@@ -190,6 +203,7 @@ public class JadxecuteDialog extends JDialog {
 		filePanel.setBorder(new EmptyBorder(10, 0, 10, 0));
 		
 		JLabel fileLabel = new JLabel("Input Java File: ");
+		fileLabel.setFont(new Font(null, Font.BOLD, DEFAULT_FONT_SIZE));
 		JTextField fileField = new JTextField(20);
 		JButton fileButton = new JButton("Browse");
 		fileButton.addActionListener(e -> {
