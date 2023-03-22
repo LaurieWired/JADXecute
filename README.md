@@ -16,22 +16,15 @@ https://user-images.githubusercontent.com/123765654/226236645-e2b05f49-6c5d-4ee0
 
 # Installation
 
-This code is based on the latest release of JADX version 1.4.6. It contains an additional plugin to enable dynamic Java coding using all of the standard Java libraries as well as the JADX libs and APIs. Simply download this release of JADX with the embedded plugin and run as you normally would! To launch JADXecute, click the coffee cup in the plugins section at the top of JADX or select "Tools -> JADXecute".
+This code is based on the latest release of JADX version 1.4.6. It contains an additional plugin to enable dynamic Java coding using all of the standard Java libraries as well as the JADX libs and APIs. 
+
+Simply download this release of JADX with the embedded plugin and run as you normally would!
 
 
 # Usage
 
-Once you've opened the plugin, enter your code into the "Java Input" area. Your code must follow the same style as the examples used below or else jadx-scripting will not be able to handle the code call. The following are a few important guidelines to follow (Note: all of these are demonstrated in the template and examples shown below):
-- Name your class "UserCodeClass"
-- Implement the userCodeMain(MainWindow mainWindow) class
-    - This will be the entrypoint to the program
-- Have "userCodeMain" return a string
-    - This return value will be the output of the console if the program ran successfully
-    - Feel free to append any debug strings you wish
-    
-Once you've written your code, hit run and you should either see successful console output or the list of code compilation errors that Java encountered when compiling your jadx-scripting code.
+### Check out our **[Wiki](https://github.com/LaurieWired/JADXecute/wiki/Usage)** for usage instructions and script examples.
 
-Optionally, you can also select from the many templates to get you started or even input your own Java file as long as it follows the guidelines from above.
 
 # Contribute
 - Make a pull request
