@@ -35,6 +35,7 @@ import javax.swing.JList;
 import javax.swing.JScrollPane;
 import javax.swing.ListSelectionModel;
 
+import jadx.gui.jobs.BackgroundExecutor;
 import jadx.gui.settings.JadxSettings;
 import jadx.gui.ui.MainWindow;
 import jadx.gui.utils.UiUtils;
@@ -66,6 +67,7 @@ public class JadxecuteDialog extends JDialog {
 		RSyntaxTextArea codeInputArea = new RSyntaxTextArea(getDefaultCodeInputText());
 		codeInputArea.setSyntaxEditingStyle(SyntaxConstants.SYNTAX_STYLE_JAVA);
 		JScrollPane codeInputScrollPanel = new JScrollPane(codeInputArea);
+		codeInputScrollPanel.setPreferredSize(new Dimension(550, 200));
 		
 		JLabel consoleOutputDescription = new JLabel("Console Output");
 		consoleOutputDescription.setPreferredSize(new Dimension(80, 16));
@@ -76,6 +78,7 @@ public class JadxecuteDialog extends JDialog {
 		consoleOutputArea.setForeground(Color.WHITE);
 
 		JScrollPane consoleOutputScrollPanel = new JScrollPane(consoleOutputArea);
+		consoleOutputScrollPanel.setPreferredSize(new Dimension(550, 100));
 
 		// Input and output code areas
 		JPanel codePanel = initCodePanel(codeInputDescription, codeInputScrollPanel, consoleOutputDescription, consoleOutputScrollPanel);
@@ -146,6 +149,7 @@ public class JadxecuteDialog extends JDialog {
 		southExamplesPanel.add(exampleScrollPane, BorderLayout.CENTER);
 		codeExamplesPanel.add(filePanel, BorderLayout.NORTH);
 		codeExamplesPanel.add(southExamplesPanel, BorderLayout.CENTER);
+		codeExamplesPanel.setPreferredSize(new Dimension(200, 400));
 
 		return codeExamplesPanel;
 	}
@@ -157,7 +161,7 @@ public class JadxecuteDialog extends JDialog {
 		setTitle("JADXecute");
 		pack();
 		if (!mainWindow.getSettings().loadWindowPos(this)) {
-			setSize(700, 500);
+			setSize(800, 500);
 		}
 		setLocationRelativeTo(null);
 		setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
@@ -293,12 +297,25 @@ public class JadxecuteDialog extends JDialog {
 
 	private void runUserCode(RSyntaxTextArea codeInputArea, JTextArea consoleOutputArea, JLabel statusLabel, JButton run) {
 		statusLabel.setText("Status: Running...");
-		statusLabel.setForeground(Color.YELLOW);
+		statusLabel.setForeground(Color.ORANGE);
 
-		run.setText("Stop");
-		run.setForeground(Color.RED);
+		BackgroundExecutor executor = mainWindow.getBackgroundExecutor();
+		executor.execute("Jadexecute Task", () -> executeBackgroundTask(codeInputArea, consoleOutputArea, statusLabel), 
+			analysisStatus -> finishTask(consoleOutputArea, statusLabel));
+	}
 
-        String codeInput = codeInputArea.getText();
+	private void finishTask(JTextArea consoleOutputArea, JLabel statusLabel) {
+		if (consoleOutputArea.getText().contains("Java compilation error")) {
+			statusLabel.setText("Status: Error");
+			statusLabel.setForeground(Color.RED);
+		} else {
+			statusLabel.setText("Status: Done");
+			statusLabel.setForeground(Color.GREEN);
+		}
+	}
+
+	private void executeBackgroundTask(RSyntaxTextArea codeInputArea, JTextArea consoleOutputArea, JLabel statusLabel) {
+		String codeInput = codeInputArea.getText();
 
 		try{
             UserCodeLoader userCodeLoader = new UserCodeLoader();
@@ -309,17 +326,6 @@ public class JadxecuteDialog extends JDialog {
 			statusLabel.setText("Status: Error");
 			statusLabel.setForeground(Color.RED);
         }
-
-		if (consoleOutputArea.getText().contains("Java compilation error")) {
-			statusLabel.setText("Status: Error");
-			statusLabel.setForeground(Color.RED);
-		} else {
-			statusLabel.setText("Status: Done");
-			statusLabel.setForeground(Color.GREEN);
-		}
-
-		run.setText("Run");
-		run.setForeground(null);
 	}
 
 	private void close() {
