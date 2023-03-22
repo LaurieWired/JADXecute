@@ -39,7 +39,6 @@ import jadx.gui.jobs.BackgroundExecutor;
 import jadx.gui.settings.JadxSettings;
 import jadx.gui.ui.MainWindow;
 import jadx.gui.utils.UiUtils;
-import jadx.gui.JadxWrapper;
 
 public class JadxecuteDialog extends JDialog {
 	private static final Logger LOG = LoggerFactory.getLogger(JadxecuteDialog.class);
@@ -54,9 +53,6 @@ public class JadxecuteDialog extends JDialog {
 	}
 
 	private void initUI() {
-		JadxWrapper jadxWrapper = new JadxWrapper(mainWindow);
-		jadxWrapper.open();
-		
 		JPanel mainPanel = new JPanel();
 		mainPanel.setLayout(new BorderLayout());
 		mainPanel.setBorder(new EmptyBorder(10, 10, 10, 10));
