@@ -25,6 +25,8 @@ Simply download this release of JADX with the embedded plugin and run as you nor
 
 ### Check out our **[Wiki](https://github.com/LaurieWired/JADXecute/wiki/Usage)** for usage instructions and script examples.
 
+### Official Tutorial Video: https://youtu.be/g0r3C1iEeBg
+
 
 # Contribute
 - Make a pull request
