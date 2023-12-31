@@ -95,11 +95,9 @@ import jadx.gui.device.debugger.BreakpointManager;
 import jadx.gui.jobs.BackgroundExecutor;
 import jadx.gui.jobs.DecompileTask;
 import jadx.gui.jobs.ExportTask;
-import jadx.gui.jobs.ProcessResult;
 import jadx.gui.jobs.TaskStatus;
 import jadx.gui.plugins.mappings.MappingExporter;
 import jadx.gui.plugins.quark.QuarkDialog;
-import jadx.gui.plugins.jadxecute.JadxecuteDialog;
 import jadx.gui.settings.JadxProject;
 import jadx.gui.settings.JadxSettings;
 import jadx.gui.settings.JadxSettingsWindow;
@@ -172,9 +170,9 @@ public class MainWindow extends JFrame {
 	private static final ImageIcon ICON_BACK = UiUtils.openSvgIcon("ui/left");
 	private static final ImageIcon ICON_FORWARD = UiUtils.openSvgIcon("ui/right");
 	private static final ImageIcon ICON_QUARK = UiUtils.openSvgIcon("ui/quark");
-	private static final ImageIcon ICON_JADXECUTE = UiUtils.openSvgIcon("ui/jadxecute");
 	private static final ImageIcon ICON_PREF = UiUtils.openSvgIcon("ui/settings");
 	private static final ImageIcon ICON_DEOBF = UiUtils.openSvgIcon("ui/helmChartLock");
+	private static final ImageIcon ICON_DECOMPILE_ALL = UiUtils.openSvgIcon("ui/runAll");
 	private static final ImageIcon ICON_LOG = UiUtils.openSvgIcon("ui/logVerbose");
 	private static final ImageIcon ICON_INFO = UiUtils.openSvgIcon("ui/showInfos");
 	private static final ImageIcon ICON_DEBUGGER = UiUtils.openSvgIcon("ui/startDebugger");
@@ -610,54 +608,17 @@ public class MainWindow extends JFrame {
 			new Timer().schedule(new TimerTask() {
 				@Override
 				public void run() {
-					waitDecompileTask();
+					requestFullDecompilation();
 				}
 			}, 1000);
 		}
 	}
 
-	private static final Object DECOMPILER_TASK_SYNC = new Object();
-
-	public void waitDecompileTask() {
-		synchronized (DECOMPILER_TASK_SYNC) {
-			try {
-				DecompileTask decompileTask = new DecompileTask(wrapper);
-				backgroundExecutor.executeAndWait(decompileTask);
-				backgroundExecutor.execute(decompileTask.getTitle(), wrapper::unloadClasses).get();
-				processDecompilationResults(decompileTask.getResult());
-				System.gc();
-			} catch (Exception e) {
-				LOG.error("Decompile task execution failed", e);
-			}
-		}
-	}
-
-	private void processDecompilationResults(ProcessResult decompile) {
-		int skippedCls = decompile.getSkipped();
-		if (skippedCls == 0) {
+	public void requestFullDecompilation() {
+		if (cacheObject.isFullDecompilationFinished()) {
 			return;
 		}
-		TaskStatus status = decompile.getStatus();
-		LOG.warn("Decompile and indexing of some classes skipped: {}, status: {}", skippedCls, status);
-		switch (status) {
-			case CANCEL_BY_USER: {
-				String reason = NLS.str("message.userCancelTask");
-				String message = NLS.str("message.indexIncomplete", reason, skippedCls);
-				JOptionPane.showMessageDialog(this, message);
-				break;
-			}
-			case CANCEL_BY_TIMEOUT: {
-				String reason = NLS.str("message.taskTimeout", decompile.getTimeLimit());
-				String message = NLS.str("message.indexIncomplete", reason, skippedCls);
-				JOptionPane.showMessageDialog(this, message);
-				break;
-			}
-			case CANCEL_BY_MEMORY: {
-				showHeapUsageBar();
-				JOptionPane.showMessageDialog(this, NLS.str("message.indexingClassesSkipped", skippedCls));
-				break;
-			}
-		}
+		backgroundExecutor.execute(new DecompileTask(this));
 	}
 
 	public void cancelBackgroundJobs() {
@@ -1043,6 +1004,10 @@ public class MainWindow extends JFrame {
 		commentSearchAction.putValue(Action.ACCELERATOR_KEY, getKeyStroke(KeyEvent.VK_SEMICOLON,
 				UiUtils.ctrlButton() | KeyEvent.SHIFT_DOWN_MASK));
 
+		ActionHandler decompileAllAction = new ActionHandler(ev -> requestFullDecompilation());
+		decompileAllAction.setNameAndDesc(NLS.str("menu.decompile_all"));
+		decompileAllAction.setIcon(ICON_DECOMPILE_ALL);
+
 		Action deobfAction = new AbstractAction(NLS.str("menu.deobfuscation"), ICON_DEOBF) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -1103,14 +1068,6 @@ public class MainWindow extends JFrame {
 		};
 		quarkAction.putValue(Action.SHORT_DESCRIPTION, "Quark Engine");
 
-		Action jadxecuteAction = new AbstractAction("JADXecute", ICON_JADXECUTE) {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				new JadxecuteDialog(MainWindow.this).setVisible(true);
-			}
-		};
-		jadxecuteAction.putValue(Action.SHORT_DESCRIPTION, "JADXecute");
-
 		Action openDeviceAction = new AbstractAction(NLS.str("debugger.process_selector"), ICON_DEBUGGER) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -1162,9 +1119,9 @@ public class MainWindow extends JFrame {
 
 		JMenu tools = new JMenu(NLS.str("menu.tools"));
 		tools.setMnemonic(KeyEvent.VK_T);
+		tools.add(decompileAllAction);
 		tools.add(deobfMenuItem);
 		tools.add(quarkAction);
-		tools.add(jadxecuteAction);
 		tools.add(openDeviceAction);
 
 		JMenu help = new JMenu(NLS.str("menu.help"));
@@ -1220,7 +1177,6 @@ public class MainWindow extends JFrame {
 		toolbar.addSeparator();
 		toolbar.add(deobfToggleBtn);
 		toolbar.add(quarkAction);
-		toolbar.add(jadxecuteAction);
 		toolbar.add(openDeviceAction);
 		toolbar.addSeparator();
 		toolbar.add(logAction);
@@ -1243,9 +1199,9 @@ public class MainWindow extends JFrame {
 			exportAction.setEnabled(loaded);
 			saveProjectAsAction.setEnabled(loaded);
 			reload.setEnabled(loaded);
+			decompileAllAction.setEnabled(loaded);
 			deobfAction.setEnabled(loaded);
 			quarkAction.setEnabled(loaded);
-			jadxecuteAction.setEnabled(loaded);
 			return false;
 		});
 	}

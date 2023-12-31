@@ -5,7 +5,7 @@ import jadx.api.metadata.ICodeMetadata;
 
 public class SimpleCodeInfo implements ICodeInfo {
 
-	private String code;
+	private final String code;
 
 	public SimpleCodeInfo(String code) {
 		this.code = code;

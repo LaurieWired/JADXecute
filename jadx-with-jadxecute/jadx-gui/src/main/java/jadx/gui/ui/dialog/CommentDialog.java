@@ -62,11 +62,6 @@ public class CommentDialog extends JDialog {
 			}
 			List<ICodeComment> list = new ArrayList<>(codeData.getComments());
 			updater.accept(list);
-			for (ICodeComment comment : list) {
-                LOG.info("Comment: " + comment.getComment());
-                LOG.info("getNodeRef: " + comment.getNodeRef());
-                LOG.info("getCodeRef: " + comment.getCodeRef());
-            }
 			Collections.sort(list);
 			codeData.setComments(list);
 			project.setCodeData(codeData);

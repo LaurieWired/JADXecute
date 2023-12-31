@@ -109,10 +109,10 @@ public class ResXmlGen {
 			addSimpleValue(cw, ri.getTypeName(), ri.getTypeName(), "name", ri.getKeyName(), valueStr);
 		} else {
 			cw.startLine();
-			cw.add('<').add(ri.getTypeName()).add(' ');
+			cw.add('<').add(ri.getTypeName()).add(" name=\"");
 			String itemTag = "item";
 			if (ri.getTypeName().equals("attr") && !ri.getNamedValues().isEmpty()) {
-				cw.add("name=\"").add(ri.getKeyName());
+				cw.add(ri.getKeyName());
 				int type = ri.getNamedValues().get(0).getRawValue().getData();
 				if ((type & ValuesParser.ATTR_TYPE_ENUM) != 0) {
 					itemTag = "enum";
@@ -123,15 +123,17 @@ public class ResXmlGen {
 				if (formatValue != null) {
 					cw.add("\" format=\"").add(formatValue);
 				}
-				cw.add("\"");
 			} else {
-				cw.add("name=\"").add(ri.getKeyName()).add('\"');
+				cw.add(ri.getKeyName());
 			}
-			if (ri.getParentRef() != 0) {
-				String parent = vp.decodeValue(TYPE_REFERENCE, ri.getParentRef());
-				cw.add(" parent=\"").add(parent).add('\"');
+			if (ri.getTypeName().equals("style") || ri.getParentRef() != 0) {
+				cw.add("\" parent=\"");
+				if (ri.getParentRef() != 0) {
+					String parent = vp.decodeValue(TYPE_REFERENCE, ri.getParentRef());
+					cw.add(parent);
+				}
 			}
-			cw.add(">");
+			cw.add("\">");
 
 			cw.incIndent();
 			for (RawNamedValue value : ri.getNamedValues()) {
@@ -177,7 +179,18 @@ public class ResXmlGen {
 			if (dataType == ParserConstants.TYPE_INT_DEC && nameStr != null) {
 				try {
 					int intVal = Integer.parseInt(valueStr);
-					String newVal = ManifestAttributes.getInstance().decode(nameStr.replace("android:attr.", ""), intVal);
+					String newVal = ManifestAttributes.getInstance().decode(nameStr.replace("android:", "").replace("attr.", ""), intVal);
+					if (newVal != null) {
+						valueStr = newVal;
+					}
+				} catch (NumberFormatException e) {
+					// ignore
+				}
+			}
+			if (dataType == ParserConstants.TYPE_INT_HEX && nameStr != null) {
+				try {
+					int intVal = Integer.decode(valueStr);
+					String newVal = ManifestAttributes.getInstance().decode(nameStr.replace("android:", "").replace("attr.", ""), intVal);
 					if (newVal != null) {
 						valueStr = newVal;
 					}

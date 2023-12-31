@@ -9,7 +9,7 @@ import jadx.api.metadata.impl.CodeMetadataStorage;
 
 public class AnnotatedCodeInfo implements ICodeInfo {
 
-	private String code;
+	private final String code;
 	private final ICodeMetadata metadata;
 
 	public AnnotatedCodeInfo(String code, Map<Integer, Integer> lineMapping, Map<Integer, ICodeAnnotation> annotations) {

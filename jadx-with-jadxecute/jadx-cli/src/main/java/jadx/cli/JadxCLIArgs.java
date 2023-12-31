@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -88,6 +90,9 @@ public class JadxCLIArgs {
 
 	@Parameter(names = { "--no-inline-methods" }, description = "disable methods inline")
 	protected boolean inlineMethods = true;
+
+	@Parameter(names = { "--no-inline-kotlin-lambda" }, description = "disable inline for Kotlin lambdas")
+	protected boolean allowInlineKotlinLambda = true;
 
 	@Parameter(names = "--no-finally", description = "don't extract finally block")
 	protected boolean extractFinally = true;
@@ -187,7 +192,7 @@ public class JadxCLIArgs {
 	@Parameter(
 			names = { "--log-level" },
 			description = "set log level, values: quiet, progress, error, warn, info, debug",
-			converter = LogHelper.LogLevelConverter.class
+			converter = LogLevelConverter.class
 	)
 	protected LogHelper.LogLevelEnum logLevel = LogHelper.LogLevelEnum.PROGRESS;
 
@@ -285,6 +290,7 @@ public class JadxCLIArgs {
 		args.setInsertDebugLines(addDebugLines);
 		args.setInlineAnonymousClasses(inlineAnonymousClasses);
 		args.setInlineMethods(inlineMethods);
+		args.setAllowInlineKotlinLambda(allowInlineKotlinLambda);
 		args.setExtractFinally(extractFinally);
 		args.setRenameFlags(renameFlags);
 		args.setFsCaseSensitive(fsCaseSensitive);
@@ -364,6 +370,10 @@ public class JadxCLIArgs {
 
 	public boolean isInlineMethods() {
 		return inlineMethods;
+	}
+
+	public boolean isAllowInlineKotlinLambda() {
+		return allowInlineKotlinLambda;
 	}
 
 	public boolean isExtractFinally() {
@@ -487,67 +497,58 @@ public class JadxCLIArgs {
 		}
 	}
 
-	public static class CommentsLevelConverter implements IStringConverter<CommentsLevel> {
-		@Override
-		public CommentsLevel convert(String value) {
-			try {
-				return CommentsLevel.valueOf(value.toUpperCase());
-			} catch (Exception e) {
-				throw new IllegalArgumentException(
-						'\'' + value + "' is unknown comments level, possible values are: "
-								+ JadxCLIArgs.enumValuesString(CommentsLevel.values()));
-			}
+	public static class CommentsLevelConverter extends BaseEnumConverter<CommentsLevel> {
+		public CommentsLevelConverter() {
+			super(CommentsLevel::valueOf, CommentsLevel::values);
 		}
 	}
 
-	public static class UseKotlinMethodsForVarNamesConverter implements IStringConverter<UseKotlinMethodsForVarNames> {
-		@Override
-		public UseKotlinMethodsForVarNames convert(String value) {
-			try {
-				return UseKotlinMethodsForVarNames.valueOf(value.replace('-', '_').toUpperCase());
-			} catch (Exception e) {
-				throw new IllegalArgumentException(
-						'\'' + value + "' is unknown, possible values are: "
-								+ JadxCLIArgs.enumValuesString(CommentsLevel.values()));
-			}
+	public static class UseKotlinMethodsForVarNamesConverter extends BaseEnumConverter<UseKotlinMethodsForVarNames> {
+		public UseKotlinMethodsForVarNamesConverter() {
+			super(UseKotlinMethodsForVarNames::valueOf, UseKotlinMethodsForVarNames::values);
 		}
 	}
 
-	public static class DeobfuscationMapFileModeConverter implements IStringConverter<DeobfuscationMapFileMode> {
-		@Override
-		public DeobfuscationMapFileMode convert(String value) {
-			try {
-				return DeobfuscationMapFileMode.valueOf(value.toUpperCase());
-			} catch (Exception e) {
-				throw new IllegalArgumentException(
-						'\'' + value + "' is unknown, possible values are: "
-								+ JadxCLIArgs.enumValuesString(DeobfuscationMapFileMode.values()));
-			}
+	public static class DeobfuscationMapFileModeConverter extends BaseEnumConverter<DeobfuscationMapFileMode> {
+		public DeobfuscationMapFileModeConverter() {
+			super(DeobfuscationMapFileMode::valueOf, DeobfuscationMapFileMode::values);
 		}
 	}
 
-	public static class ResourceNameSourceConverter implements IStringConverter<ResourceNameSource> {
-		@Override
-		public ResourceNameSource convert(String value) {
-			try {
-				return ResourceNameSource.valueOf(value.toUpperCase());
-			} catch (Exception e) {
-				throw new IllegalArgumentException(
-						'\'' + value + "' is unknown, possible values are: "
-								+ JadxCLIArgs.enumValuesString(ResourceNameSource.values()));
-			}
+	public static class ResourceNameSourceConverter extends BaseEnumConverter<ResourceNameSource> {
+		public ResourceNameSourceConverter() {
+			super(ResourceNameSource::valueOf, ResourceNameSource::values);
 		}
 	}
 
-	public static class DecompilationModeConverter implements IStringConverter<DecompilationMode> {
+	public static class DecompilationModeConverter extends BaseEnumConverter<DecompilationMode> {
+		public DecompilationModeConverter() {
+			super(DecompilationMode::valueOf, DecompilationMode::values);
+		}
+	}
+
+	public static class LogLevelConverter extends BaseEnumConverter<LogHelper.LogLevelEnum> {
+		public LogLevelConverter() {
+			super(LogHelper.LogLevelEnum::valueOf, LogHelper.LogLevelEnum::values);
+		}
+	}
+
+	public abstract static class BaseEnumConverter<E extends Enum<E>> implements IStringConverter<E> {
+		private final Function<String, E> parse;
+		private final Supplier<E[]> values;
+
+		public BaseEnumConverter(Function<String, E> parse, Supplier<E[]> values) {
+			this.parse = parse;
+			this.values = values;
+		}
+
 		@Override
-		public DecompilationMode convert(String value) {
+		public E convert(String value) {
 			try {
-				return DecompilationMode.valueOf(value.toUpperCase());
+				return parse.apply(stringAsEnumName(value));
 			} catch (Exception e) {
 				throw new IllegalArgumentException(
-						'\'' + value + "' is unknown, possible values are: "
-								+ JadxCLIArgs.enumValuesString(DecompilationMode.values()));
+						'\'' + value + "' is unknown, possible values are: " + enumValuesString(values.get()));
 			}
 		}
 	}
@@ -556,5 +557,10 @@ public class JadxCLIArgs {
 		return Stream.of(values)
 				.map(v -> v.name().replace('_', '-').toLowerCase(Locale.ROOT))
 				.collect(Collectors.joining(", "));
+	}
+
+	private static String stringAsEnumName(String value) {
+		// inverse of enumValuesString conversion
+		return value.replace('-', '_').toUpperCase(Locale.ROOT);
 	}
 }
