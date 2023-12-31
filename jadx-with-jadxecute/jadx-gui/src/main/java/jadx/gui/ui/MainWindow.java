@@ -98,6 +98,7 @@ import jadx.gui.jobs.ExportTask;
 import jadx.gui.jobs.TaskStatus;
 import jadx.gui.plugins.mappings.MappingExporter;
 import jadx.gui.plugins.quark.QuarkDialog;
+import jadx.gui.plugins.jadxecute.JadxecuteDialog;
 import jadx.gui.settings.JadxProject;
 import jadx.gui.settings.JadxSettings;
 import jadx.gui.settings.JadxSettingsWindow;
@@ -170,6 +171,7 @@ public class MainWindow extends JFrame {
 	private static final ImageIcon ICON_BACK = UiUtils.openSvgIcon("ui/left");
 	private static final ImageIcon ICON_FORWARD = UiUtils.openSvgIcon("ui/right");
 	private static final ImageIcon ICON_QUARK = UiUtils.openSvgIcon("ui/quark");
+	private static final ImageIcon ICON_JADXECUTE = UiUtils.openSvgIcon("ui/jadxecute");
 	private static final ImageIcon ICON_PREF = UiUtils.openSvgIcon("ui/settings");
 	private static final ImageIcon ICON_DEOBF = UiUtils.openSvgIcon("ui/helmChartLock");
 	private static final ImageIcon ICON_DECOMPILE_ALL = UiUtils.openSvgIcon("ui/runAll");
@@ -1068,6 +1070,14 @@ public class MainWindow extends JFrame {
 		};
 		quarkAction.putValue(Action.SHORT_DESCRIPTION, "Quark Engine");
 
+		Action jadxecuteAction = new AbstractAction("JADXecute", ICON_JADXECUTE) {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				new JadxecuteDialog(MainWindow.this).setVisible(true);
+			}
+		};
+		jadxecuteAction.putValue(Action.SHORT_DESCRIPTION, "JADXecute");
+
 		Action openDeviceAction = new AbstractAction(NLS.str("debugger.process_selector"), ICON_DEBUGGER) {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -1122,6 +1132,7 @@ public class MainWindow extends JFrame {
 		tools.add(decompileAllAction);
 		tools.add(deobfMenuItem);
 		tools.add(quarkAction);
+		tools.add(jadxecuteAction);
 		tools.add(openDeviceAction);
 
 		JMenu help = new JMenu(NLS.str("menu.help"));
@@ -1177,6 +1188,7 @@ public class MainWindow extends JFrame {
 		toolbar.addSeparator();
 		toolbar.add(deobfToggleBtn);
 		toolbar.add(quarkAction);
+		toolbar.add(jadxecuteAction);
 		toolbar.add(openDeviceAction);
 		toolbar.addSeparator();
 		toolbar.add(logAction);
@@ -1202,6 +1214,7 @@ public class MainWindow extends JFrame {
 			decompileAllAction.setEnabled(loaded);
 			deobfAction.setEnabled(loaded);
 			quarkAction.setEnabled(loaded);
+			jadxecuteAction.setEnabled(loaded);
 			return false;
 		});
 	}
