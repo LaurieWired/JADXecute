@@ -16,7 +16,7 @@ https://user-images.githubusercontent.com/123765654/226236645-e2b05f49-6c5d-4ee0
 
 # Installation
 
-This code is based on the latest release of JADX version 1.4.6. It contains an additional plugin to enable dynamic Java coding using all of the standard Java libraries as well as the JADX libs and APIs. 
+This code is based on the latest release of JADX version 1.4.7. It contains an additional plugin to enable dynamic Java coding using all of the standard Java libraries as well as the JADX libs and APIs. 
 
 Simply download this release of JADX with the embedded plugin and run as you normally would!
 
