@@ -72,7 +72,7 @@ jobs:
           JADX_VERSION="${JADX_LAST_TAG:1}.$GITHUB_RUN_NUMBER-${GITHUB_SHA:0:8}"
           echo "JADX_VERSION=$JADX_VERSION" >> $GITHUB_ENV
 
-      - uses: gradle/gradle-build-action@v2
+      - uses: gradle/gradle-build-action@v3
         name: Build with Gradle
         env:
           TERM: dumb
